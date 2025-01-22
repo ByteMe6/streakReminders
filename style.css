@@ -1,197 +1,240 @@
 /* Обновленные стили */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f9f9f7;
-    margin: 0;
-    padding: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background-color: #f9f9f7;
+  margin: 0;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 h1 {
-    font-size: 28px;
-    color: #333;
-    margin-bottom: 20px;
-    text-align: center;
+  font-size: 28px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 form {
-    background: #fff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-    width: 350px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  width: 350px;
 }
 
 input {
-    display: block;
-    margin: 15px 0;
-    padding: 12px;
-    width: 100%;
-    max-width: 100%;
-    border: 1px solid #d0d0d5;
-    border-radius: 12px;
-    font-size: 16px;
-    transition: border-color 0.3s ease;
+  display: block;
+  margin: 15px 0;
+  padding: 12px;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #d0d0d5;
+  border-radius: 12px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
 }
 
 input:focus {
-    border-color: #0071e3;
-    outline: none;
+  border-color: #0071e3;
+  outline: none;
 }
 
 button {
-    padding: 12px;
-    background-color: #0071e3;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%;
+  padding: 12px;
+  background-color: #0071e3;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
 }
 
 button:hover {
-    background-color: #005bb5;
+  background-color: #005bb5;
 }
 
 button:disabled {
-    background-color: #d0d0d5;
-    cursor: not-allowed;
+  background-color: #d0d0d5;
+  cursor: not-allowed;
 }
 
 #streaksContainer {
-    width: 350px;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
+  width: 350px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
 }
 
 .streak-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px;
-    border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
 }
 
 .streak-item button {
-    background-color: #dc3545;
-    border-radius: 50%;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-size: 14px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .streak-item button:hover {
-    background-color: #c82333;
+  background-color: #c82333;
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px;
 }
 
 h1 {
-    font-size: 24px;
-    color: #333;
+  font-size: 24px;
+  color: #333;
 }
 
 form {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px; /* Скругленные углы */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень */
-    margin-bottom: 20px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px; /* Скругленные углы */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень */
+  margin-bottom: 20px;
 }
 
 input {
-    display: block;
-    margin: 10px 0;
-    padding: 10px;
-    width: 100%;
-    max-width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
 }
 
 button {
-    padding: 12px;
-    background-color: #007aff; /* Цвет кнопки, как у Apple */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    max-width: 300px;
-    font-size: 16px;
+  padding: 12px;
+  background-color: #007aff; /* Цвет кнопки, как у Apple */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  font-size: 16px;
 }
 
 button:hover {
-    background-color: #0051a8; /* Тень на кнопке */
+  background-color: #0051a8; /* Тень на кнопке */
 }
 
-#loginForm, #registerForm {
-    display: block;
+#loginForm,
+#registerForm {
+  display: block;
 }
 
 #streaksContainer {
-    display: none;
+  display: none;
 }
 
 #streaksList {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 button {
-    padding: 12px;
-    background-color: #007aff;
-    /* Цвет кнопки, как у Apple */
-    color: white;
-    border: none;
-    border-radius: 4px;
-    /* Убираем закругления для редактирования/удаления кнопок */
-    cursor: pointer;
-    width: 100%;
-    max-width: 300px;
-    font-size: 16px;
+  padding: 12px;
+  background-color: #007aff;
+  /* Цвет кнопки, как у Apple */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  /* Убираем закругления для редактирования/удаления кнопок */
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  font-size: 16px;
 }
 
 button:hover {
-    background-color: #0051a8;
-    /* Тень на кнопке */
+  background-color: #0051a8;
+  /* Тень на кнопке */
 }
 
 .editButton,
 .deleteButton {
-    padding: 8px 16px;
-    background-color: #007aff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    /* Обычные кнопки */
-    cursor: pointer;
-    font-size: 14px;
-    margin: 5px;
+  padding: 8px 16px;
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  /* Обычные кнопки */
+  cursor: pointer;
+  font-size: 14px;
+  margin: 5px;
 }
 
 .editButton:hover,
-.deleteButton:hover { 
-    background-color: #0051a8;
-    /* Цвет при наведении */
+.deleteButton:hover {
+  background-color: #0051a8;
+  /* Цвет при наведении */
 }
 
 * {
-    box-sizing: border-box;
-    transition: all 0.3s ease;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
 }
 
-button{
-    margin-top: 10px;
+button {
+  margin-top: 10px;
+}
+
+.addStreak {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  flex-direction: column;
+  background: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  transition: all 0.5s ease;
+
+  -webkit-box-shadow: 14px 18px 61px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 14px 18px 61px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: 14px 18px 61px 0px rgba(0, 0, 0, 0.75);
+}
+.addStreak:hover {
+  transform: scale(1.2);
+}
+body{
+    display: flex;
+    flex-direction: column;
+}
+footer{
+    margin-top: auto;
+    text-align: center;
+    padding: 10px;
+}
+.streakCount{
+    color: #dc3545;
+    font-size: 30px;
+}
+.streakItem{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    flex-direction: column;
 }

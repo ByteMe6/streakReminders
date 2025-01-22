@@ -12,7 +12,7 @@
     />
   </head>
   <body>
-    <div class="container">
+    <main class="container">
       <div id="registerSection">
         <h1 class="header">Регистрация</h1>
         <form id="registerForm" class="form">
@@ -57,7 +57,16 @@
         class="streaks-container"
         style="display: none"
       >
-        <h1 class="header">Управление стриками</h1>
+        <div id="streaksList"></div>
+        <button id="continueStreakButton" class="button">
+          Продолжить стрик
+        </button>
+        <div id="currentStreakInfo"></div>
+        <!-- <button id="logoutButton" class="logout-button">Выйти</button> -->
+      </div>
+
+      <div class="addStreak">
+        <h1 class="header">Добавить стрик</h1>
         <input
           type="text"
           id="streakName"
@@ -66,15 +75,12 @@
           required
         />
         <button id="addStreakButton" class="button">Добавить стрик</button>
-        <div id="streaksList"></div>
-        <button id="continueStreakButton" class="button">
-          Продолжить стрик
-        </button>
-        <div id="currentStreakInfo"></div>
-        <!-- <button id="logoutButton" class="logout-button">Выйти</button> -->
-        <button id="logoutButton" style="display: none">Выйти</button>
       </div>
-    </div>
+    </main>
+    <footer>
+      <button id="logoutButton" style="display: none">Выйти</button>
+    </footer>
+
     <!-- Toastify JS -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="./firebase.js"></script>

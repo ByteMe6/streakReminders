@@ -110,10 +110,22 @@ const loadStreaks = (userId) => {
             streaksList.innerHTML = ''; // Очистить список перед добавлением
             snapshot.forEach((childSnapshot) => {
                 const streak = childSnapshot.val();
+                
+                // Создаем элементы
                 const streakItem = document.createElement('div');
-                streakItem.textContent = `${childSnapshot.key}: ${streak.count} (Последнее обновление: ${new Date(
-                    streak.lastUpdated
-                ).toLocaleDateString()})`;
+                streakItem.classList.add('streakItem');
+                const streakName = document.createTextNode(`${childSnapshot.key} `);
+                const streakCount = document.createElement('span');
+                streakCount.classList.add('streakCount');
+                streakCount.className = 'streakCount';
+                streakCount.textContent = streak.count;
+                const lastUpdated = document.createTextNode(` (Последнее обновление: ${new Date(streak.lastUpdated).toLocaleDateString()})`);
+
+                // Собираем элементы
+                streakItem.appendChild(streakName);
+                streakItem.appendChild(streakCount);
+                streakItem.appendChild(lastUpdated);
+
                 streaksList.appendChild(streakItem);
             });
         } else {
@@ -123,7 +135,6 @@ const loadStreaks = (userId) => {
         showToast('Ошибка при загрузке стриков: ' + error.message, "error");
     });
 };
-
 // Функция для продолжения стриков
 const continueStreak = (userId) => {
     const streaksRef = ref(database, 'users/' + userId + '/streaks/');
