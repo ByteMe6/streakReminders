@@ -1,4 +1,5 @@
-import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut } from './firebase.js';
+// import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut } from './firebase.js';
+import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut, remove } from './firebase.js';
 
 // Функция для регистрации пользователя
 const registerUser = (email, password) => {
@@ -78,7 +79,7 @@ document.getElementById('loginForm').addEventListener('submit', (e) => {
 const addStreak = (userId, streakName) => {
     const streakRef = ref(database, 'users/' + userId + '/streaks/' + streakName);
     return set(streakRef, { 
-        count: 0,
+        count: 1,
         lastUpdated: new Date().toISOString()
     });
 };
@@ -102,6 +103,7 @@ document.getElementById('addStreakButton').addEventListener('click', () => {
 });
 
 // Функция для загрузки стриков
+// Функция для загрузки стриков
 const loadStreaks = (userId) => {
     const streaksRef = ref(database, 'users/' + userId + '/streaks/');
     get(streaksRef).then((snapshot) => {
@@ -110,21 +112,55 @@ const loadStreaks = (userId) => {
             streaksList.innerHTML = ''; // Очистить список перед добавлением
             snapshot.forEach((childSnapshot) => {
                 const streak = childSnapshot.val();
-                
-                // Создаем элементы
+                const streakKey = childSnapshot.key;
+                const lastUpdated = new Date(streak.lastUpdated);
+                const today = new Date();
+
+                // Проверяем, прошло ли больше 2 суток с последнего обновления
+                const timeDifference = today - lastUpdated;
+                const twoDaysInMs = 2 * 24 * 60 * 60 * 1000; // 2 дня в миллисекундах
+
+                // Если прошло более 2 дней, обнуляем стрик
+                if (timeDifference > twoDaysInMs) {
+                    const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                    set(streakRef, {
+                        count: 0,
+                        lastUpdated: today.toISOString()
+                    });
+                    showToast(`Стрик "${streakKey}" был сброшен, так как не обновлялся более 2 дней.`, "warning");
+                }
+
+                // Создаем элементы для отображения стрика
                 const streakItem = document.createElement('div');
                 streakItem.classList.add('streakItem');
-                const streakName = document.createTextNode(`${childSnapshot.key} `);
+                const streakName = document.createTextNode(`${streakKey} `);
                 const streakCount = document.createElement('span');
                 streakCount.classList.add('streakCount');
-                streakCount.className = 'streakCount';
                 streakCount.textContent = streak.count;
-                const lastUpdated = document.createTextNode(` (Последнее обновление: ${new Date(streak.lastUpdated).toLocaleDateString()})`);
+                const lastUpdatedText = document.createTextNode(` (Последнее обновление: ${new Date(streak.lastUpdated).toLocaleDateString()})`);
+
+                // Кнопка для удаления стрика
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Удалить';
+                deleteButton.classList.add('deleteButton');
+                deleteButton.addEventListener('click', () => {
+                    deleteStreak(userId, streakKey);
+                });
+
+                // Кнопка для изменения стрика
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Изменить';
+                editButton.classList.add('editButton');
+                editButton.addEventListener('click', () => {
+                    editStreak(userId, streakKey);
+                });
 
                 // Собираем элементы
                 streakItem.appendChild(streakName);
                 streakItem.appendChild(streakCount);
-                streakItem.appendChild(lastUpdated);
+                streakItem.appendChild(lastUpdatedText);
+                streakItem.appendChild(deleteButton);
+                streakItem.appendChild(editButton);
 
                 streaksList.appendChild(streakItem);
             });
@@ -194,3 +230,55 @@ document.getElementById('logoutButton').addEventListener('click', () => {
         console.error("Ошибка при выходе:", error.message);
     });
 });
+
+// Функция для удаления стрика
+const deleteStreak = (userId, streakKey) => {
+    const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+    set(streakRef, null)  // Удаляем стрик
+        .then(() => {
+            showToast(`Стрик "${streakKey}" был удален.`);
+            loadStreaks(userId); // Обновляем список стриков
+        })
+        .catch((error) => {
+            showToast('Ошибка при удалении стрика: ' + error.message, "error");
+        });
+};
+
+// Функция для изменения стрика// Функция для редактирования стрика с использованием prompt для нового имени
+const editStreak = (userId, streakKey) => {
+    const newName = prompt("Введите новое имя для стрика", streakKey);
+
+    if (newName && newName !== streakKey) {
+        const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+        get(streakRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const streakData = snapshot.val();
+                const currentCount = streakData.count;
+                const currentLastUpdated = streakData.lastUpdated;
+
+                // Удаляем старый стрик
+                remove(streakRef).then(() => {
+                    // Добавляем новый стрик с новым именем
+                    const newStreakRef = ref(database, `users/${userId}/streaks/${newName}`);
+                    set(newStreakRef, {
+                        count: currentCount,  // Оставляем текущее количество
+                        lastUpdated: currentLastUpdated,  // Оставляем дату последнего обновления
+                    }).then(() => {
+                        showToast(`Стрик "${streakKey}" успешно изменен на "${newName}"!`);
+                        loadStreaks(userId);  // Перезагружаем список стриков
+                    }).catch((error) => {
+                        showToast('Ошибка при редактировании стрика: ' + error.message, "error");
+                    });
+                }).catch((error) => {
+                    showToast('Ошибка при удалении старого стрика: ' + error.message, "error");
+                });
+            } else {
+                showToast('Стрик не найден!', "error");
+            }
+        }).catch((error) => {
+            showToast('Ошибка при получении стрика: ' + error.message, "error");
+        });
+    } else {
+        showToast('Имя стрика не изменилось или введено некорректно!', "error");
+    }
+};
