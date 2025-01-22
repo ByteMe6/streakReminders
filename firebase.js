@@ -3,7 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebas
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
-
+import { signOut } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+// import { getDatabase, ref, set, get } from 'firebase/database';
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyBySS4zzP9t-Zk0w8dHfNijqO77GLiXSV8",
@@ -25,4 +26,4 @@ const auth = getAuth();
 const database = getDatabase();
 
 // Export functions for use in other files
-export { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get };
+export { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut};

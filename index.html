@@ -12,37 +12,72 @@
     />
   </head>
   <body>
-    <h1>Регистрация</h1>
-    <form id="registerForm">
-      <input type="email" id="registerEmail" placeholder="Email" required />
-      <input
-        type="password"
-        id="registerPassword"
-        placeholder="Пароль"
-        required
-      />
-      <button type="submit">Зарегистрироваться</button>
-    </form>
+    <div class="container">
+      <div id="registerSection">
+        <h1 class="header">Регистрация</h1>
+        <form id="registerForm" class="form">
+          <input
+            type="email"
+            id="registerEmail"
+            class="input"
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            id="registerPassword"
+            class="input"
+            placeholder="Пароль"
+            required
+          />
+          <button type="submit" class="button">Зарегистрироваться</button>
+        </form>
+        <h1 class="header">Вход</h1>
+        <form id="loginForm" class="form">
+          <input
+            type="email"
+            id="loginEmail"
+            class="input"
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            id="loginPassword"
+            class="input"
+            placeholder="Пароль"
+            required
+          />
+          <button type="submit" class="button">Войти</button>
+        </form>
+      </div>
 
-    <h1>Вход</h1>
-    <form id="loginForm">
-      <input type="email" id="loginEmail" placeholder="Email" required />
-      <input type="password" id="loginPassword" placeholder="Пароль" required />
-      <button type="submit">Войти</button>
-    </form>
-    <div id="streaksContainer" style="display: none">
-      <h1>Управление стриками</h1>
-      <input type="text" id="streakName" placeholder="Имя стрика" required />
-      <button id="addStreakButton">Добавить стрик</button>
-      <div id="streaksList"></div>
-      <button id="continueStreakButton" style="margin-top: 20px">
-        Продолжить стрик
-      </button>
-      <div id="currentStreakInfo"></div>
+      <div
+        id="streaksContainer"
+        class="streaks-container"
+        style="display: none"
+      >
+        <h1 class="header">Управление стриками</h1>
+        <input
+          type="text"
+          id="streakName"
+          class="input"
+          placeholder="Имя стрика"
+          required
+        />
+        <button id="addStreakButton" class="button">Добавить стрик</button>
+        <div id="streaksList"></div>
+        <button id="continueStreakButton" class="button">
+          Продолжить стрик
+        </button>
+        <div id="currentStreakInfo"></div>
+        <!-- <button id="logoutButton" class="logout-button">Выйти</button> -->
+        <button id="logoutButton" style="display: none">Выйти</button>
+      </div>
     </div>
     <!-- Toastify JS -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="./firebase.js"></script>
-    <script type="module" src="./index.js"></script>
+    <script type="module" src="./index.js" defer></script>
   </body>
 </html>

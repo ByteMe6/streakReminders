@@ -1,5 +1,4 @@
-// index.js
-import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get } from './firebase.js';
+import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut } from './firebase.js';
 
 // Функция для регистрации пользователя
 const registerUser = (email, password) => {
@@ -13,13 +12,29 @@ const loginUser = (email, password) => {
 
 // Проверка состояния аутентификации
 onAuthStateChanged(auth, (user) => {
+    const registerSection = document.getElementById('registerSection');
+    // const loginSection = document.getElementById('loginSection');
+    const streaksContainer = document.getElementById('streaksContainer');
+    const logoutButton = document.getElementById('logoutButton');
+    
     if (user) {
-        console.log("Пользователь аутентифицирован:", user.uid);
-        document.getElementById('streaksContainer').style.display = 'block';
-        loadStreaks(user.uid); // Загрузить стрики после входа
+        // Если пользователь аутентифицирован, скрываем формы регистрации и входа
+        registerSection.style.display = 'none';
+        // loginSection.style.display = 'none';
+        streaksContainer.style.display = 'block';
+        
+        // Показать кнопку выхода
+        logoutButton.style.display = 'inline-block';
+        
+        loadStreaks(user.uid); // Загрузить стрики
     } else {
-        console.log("Пользователь не аутентифицирован");
-        document.getElementById('streaksContainer').style.display = 'none';
+        // Если пользователь не аутентифицирован, показываем формы регистрации и входа
+        registerSection.style.display = 'block';
+        loginSection.style.display = 'block';
+        streaksContainer.style.display = 'none';
+        
+        // Скрыть кнопку выхода
+        logoutButton.style.display = 'none';
     }
 });
 
@@ -158,4 +173,13 @@ document.getElementById('continueStreakButton').addEventListener('click', () => 
     } else {
         showToast('Пожалуйста, войдите в систему, чтобы продолжить стрики!', "error");
     }
+});
+
+// Обработчик выхода из системы
+document.getElementById('logoutButton').addEventListener('click', () => {
+    signOut(auth).then(() => {
+        console.log("Пользователь вышел из системы");
+    }).catch((error) => {
+        console.error("Ошибка при выходе:", error.message);
+    });
 });
