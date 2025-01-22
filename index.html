@@ -4,11 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Streaks</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    Hi
+    <h1>Регистрация</h1>
+    <form id="registerForm">
+        <input type="email" id="registerEmail" placeholder="Email" required>
+        <input type="password" id="registerPassword" placeholder="Пароль" required>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
 
+    <h1>Вход</h1>
+    <form id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+    </form>
 
-    <script src="./firebase.js"></script>
+    <div id="streaksContainer" style="display:none;">
+        <h1>Управление стриками</h1>
+        <input type="text" id="streakName" placeholder="Имя стрика" required>
+        <button id="addStreakButton">Добавить стрик</button>
+        <div id="streaksList"></div>
+    </div>
+
+    <script type="module" src="./firebase.js"></script>
+    <script type="module" src="./index.js"></script>
 </body>
 </html>
