@@ -140,7 +140,7 @@ const loadStreaks = (userId) => {
                 // Счетчик стрика
                 const streakCount = document.createElement('span');
                 streakCount.classList.add('streakCount');
-                streakCount.textContent = `Счет: ${streak.count}`;
+                streakCount.textContent = `${streak.count}`;
 
                 // Дата последнего обновления
                 const lastUpdatedText = document.createElement('span');
