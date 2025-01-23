@@ -199,7 +199,7 @@ button {
   margin-top: 10px;
 }
 
-.addStreak {
+.addStreak, #streaksContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -208,14 +208,14 @@ button {
   background: #fff;
   padding: 20px;
   border-radius: 20px;
-  transition: all 0.5s ease;
+  transition: all 0.2s ease;
 
   -webkit-box-shadow: 14px 18px 61px 0px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: 14px 18px 61px 0px rgba(0, 0, 0, 0.75);
   box-shadow: 14px 18px 61px 0px rgba(0, 0, 0, 0.75);
 }
-.addStreak:hover {
-  transform: scale(1.2);
+.addStreak:hover, #streaksContainer:hover{
+  transform: scale(1.1);
 }
 body{
     display: flex;
@@ -237,4 +237,26 @@ footer{
     padding: 10px;
     border-bottom: 1px solid #eee;
     flex-direction: column;
+}
+.deleteButton{
+    background-color: #dc3545;
+}
+.deleteButton:hover{
+    background-color: #c82333;
+}
+.editButton{
+    background-color: #f0b429;
+}
+.editButton:hover{
+    background-color: #f1b62ebe;
+}
+.continueButton{
+    background-color: #04bb32;
+    height: auto;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+.continueButton:hover{
+    /* transform: scale(1.1); */
+    background-color: #04bb32;
 }

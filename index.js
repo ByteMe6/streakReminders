@@ -103,7 +103,7 @@ document.getElementById('addStreakButton').addEventListener('click', () => {
 });
 
 // Функция для загрузки стриков
-// Функция для загрузки стриков
+
 const loadStreaks = (userId) => {
     const streaksRef = ref(database, 'users/' + userId + '/streaks/');
     get(streaksRef).then((snapshot) => {
@@ -119,8 +119,6 @@ const loadStreaks = (userId) => {
                 // Проверяем, прошло ли больше 2 суток с последнего обновления
                 const timeDifference = today - lastUpdated;
                 const twoDaysInMs = 2 * 24 * 60 * 60 * 1000; // 2 дня в миллисекундах
-
-                // Если прошло более 2 дней, обнуляем стрик
                 if (timeDifference > twoDaysInMs) {
                     const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
                     set(streakRef, {
@@ -133,35 +131,90 @@ const loadStreaks = (userId) => {
                 // Создаем элементы для отображения стрика
                 const streakItem = document.createElement('div');
                 streakItem.classList.add('streakItem');
-                const streakName = document.createTextNode(`${streakKey} `);
+
+                // Название стрика
+                const streakName = document.createElement('span');
+                streakName.textContent = `${streakKey} `;
+                streakName.classList.add('streakName');
+
+                // Счетчик стрика
                 const streakCount = document.createElement('span');
                 streakCount.classList.add('streakCount');
-                streakCount.textContent = streak.count;
-                const lastUpdatedText = document.createTextNode(` (Последнее обновление: ${new Date(streak.lastUpdated).toLocaleDateString()})`);
+                streakCount.textContent = `Счет: ${streak.count}`;
 
-                // Кнопка для удаления стрика
+                // Дата последнего обновления
+                const lastUpdatedText = document.createElement('span');
+                lastUpdatedText.textContent = ` (Последнее обновление: ${new Date(streak.lastUpdated).toLocaleDateString()})`;
+                lastUpdatedText.classList.add('lastUpdated');
+
+                // Кнопка "Продолжить стрик"
+                const continueButton = document.createElement('button');
+                continueButton.textContent = 'Продолжить стрик';
+                continueButton.classList.add('continueButton');
+                continueButton.addEventListener('click', () => {
+                    const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                    if (today.toDateString() !== lastUpdated.toDateString()) {
+                        set(streakRef, {
+                            count: streak.count + 1,
+                            lastUpdated: today.toISOString()
+                        }).then(() => {
+                            showToast(`Вы продолжили стрик "${streakKey}". Новый счет: ${streak.count + 1}`);
+                            loadStreaks(userId); // Перезагрузить список стриков
+                        }).catch((error) => {
+                            showToast('Ошибка при обновлении стрика: ' + error.message, "error");
+                        });
+                    } else {
+                        showToast(`Стрик "${streakKey}" уже обновлен сегодня!`, "error");
+                    }
+                });
+
+                // Кнопка "Удалить"
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Удалить';
                 deleteButton.classList.add('deleteButton');
                 deleteButton.addEventListener('click', () => {
-                    deleteStreak(userId, streakKey);
+                    const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                    remove(streakRef).then(() => {
+                        showToast(`Стрик "${streakKey}" удален.`);
+                        loadStreaks(userId); // Перезагрузить список стриков
+                    }).catch((error) => {
+                        showToast('Ошибка при удалении стрика: ' + error.message, "error");
+                    });
                 });
 
-                // Кнопка для изменения стрика
+                // Кнопка "Изменить"
                 const editButton = document.createElement('button');
                 editButton.textContent = 'Изменить';
                 editButton.classList.add('editButton');
                 editButton.addEventListener('click', () => {
-                    editStreak(userId, streakKey);
+                    const newName = prompt(`Введите новое имя для стрика "${streakKey}"`, streakKey);
+                    if (newName && newName.trim() !== '') {
+                        const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                        const newStreakRef = ref(database, `users/${userId}/streaks/${newName}`);
+                        get(streakRef).then((snapshot) => {
+                            if (snapshot.exists()) {
+                                set(newStreakRef, snapshot.val()).then(() => {
+                                    remove(streakRef).then(() => {
+                                        showToast(`Стрик "${streakKey}" переименован в "${newName}".`);
+                                        loadStreaks(userId); // Перезагрузить список стриков
+                                    });
+                                });
+                            }
+                        }).catch((error) => {
+                            showToast('Ошибка при изменении стрика: ' + error.message, "error");
+                        });
+                    }
                 });
 
-                // Собираем элементы
+                // Добавляем все кнопки и текст в элемент стрика
                 streakItem.appendChild(streakName);
                 streakItem.appendChild(streakCount);
                 streakItem.appendChild(lastUpdatedText);
-                streakItem.appendChild(deleteButton);
+                streakItem.appendChild(continueButton);
                 streakItem.appendChild(editButton);
+                streakItem.appendChild(deleteButton);
 
+                // Добавляем элемент стрика в список
                 streaksList.appendChild(streakItem);
             });
         } else {
