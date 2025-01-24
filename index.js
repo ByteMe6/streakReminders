@@ -1,4 +1,3 @@
-// import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut } from './firebase.js';
 import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut, remove } from './firebase.js';
 
 // Функция для регистрации пользователя
@@ -10,34 +9,6 @@ const registerUser = (email, password) => {
 const loginUser = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
 };
-
-// Проверка состояния аутентификации
-onAuthStateChanged(auth, (user) => {
-    const registerSection = document.getElementById('registerSection');
-    // const loginSection = document.getElementById('loginSection');
-    const streaksContainer = document.getElementById('streaksContainer');
-    const logoutButton = document.getElementById('logoutButton');
-    
-    if (user) {
-        // Если пользователь аутентифицирован, скрываем формы регистрации и входа
-        registerSection.style.display = 'none';
-        // loginSection.style.display = 'none';
-        streaksContainer.style.display = 'block';
-        
-        // Показать кнопку выхода
-        logoutButton.style.display = 'inline-block';
-        
-        loadStreaks(user.uid); // Загрузить стрики
-    } else {
-        // Если пользователь не аутентифицирован, показываем формы регистрации и входа
-        registerSection.style.display = 'block';
-        loginSection.style.display = 'block';
-        streaksContainer.style.display = 'none';
-        
-        // Скрыть кнопку выхода
-        logoutButton.style.display = 'none';
-    }
-});
 
 // Функция для отображения уведомлений
 const showToast = (message, type = "success") => {
@@ -51,28 +22,129 @@ const showToast = (message, type = "success") => {
     }).showToast();
 };
 
-// Обработчик регистрации
-document.getElementById('registerForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    registerUser(email, password).then(() => {
-        showToast('Регистрация успешна!');
-    }).catch((error) => {
-        showToast(error.message, "error");
+document.addEventListener('DOMContentLoaded', () => {
+    // Проверка состояния аутентификации
+    onAuthStateChanged(auth, (user) => {
+        const registerSection = document.getElementById('registerSection');
+        const streaksContainer = document.getElementById('streaksContainer');
+        const addStreakSection = document.querySelector('.addStreak');
+        const logoutButton = document.getElementById('logoutButton');
+        
+        if (user) {
+            // Если пользователь аутентифицирован, скрываем формы регистрации и входа
+            if (registerSection) registerSection.style.display = 'none';
+            if (streaksContainer) streaksContainer.style.display = 'block';
+            if (addStreakSection) addStreakSection.style.display = 'block';
+            
+            // Показать кнопку выхода
+            if (logoutButton) logoutButton.style.display = 'inline-block';
+            
+            loadStreaks(user.uid); // Загрузить стрики
+        } else {
+            // Если пользователь не аутентифицирован, показываем формы регистрации и входа
+            if (registerSection) registerSection.style.display = 'block';
+            if (streaksContainer) streaksContainer.style.display = 'none';
+            if (addStreakSection) addStreakSection.style.display = 'none';
+            
+            // Скрыть кнопку выхода
+            if (logoutButton) logoutButton.style.display = 'none';
+        }
     });
-});
 
-// Обработчик входа
-document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    loginUser(email, password).then(() => {
-        showToast('Вход успешен!');
-    }).catch((error) => {
-        showToast(error.message, "error");
-    });
+    // Обработчик регистрации
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            registerUser(email, password).then(() => {
+                showToast('Регистрация успешна!');
+            }).catch((error) => {
+                showToast(error.message, "error");
+            });
+        });
+    }
+
+    // Обработчик входа
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            loginUser(email, password).then(() => {
+                showToast('Вход успешен!');
+            }).catch((error) => {
+                showToast(error.message, "error");
+            });
+        });
+    }
+
+    // Обработчик добавления стрика
+    const addStreakButton = document.getElementById('addStreakButton');
+    if (addStreakButton) {
+        addStreakButton.addEventListener('click', () => {
+            const userId = auth.currentUser?.uid; // Получаем ID текущего пользователя
+            const streakName = document.getElementById('streakName').value;
+
+            if (userId && streakName) {
+                addStreak(userId, streakName).then(() => {
+                    showToast('Стрик добавлен!');
+                    document.getElementById('streakName').value = ''; // Очистить поле ввода
+                    loadStreaks(userId); // Обновить список стриков
+                }).catch((error) => {
+                    showToast('Ошибка при добавлении стрика: ' + error.message, "error");
+                });
+            } else {
+                showToast('Введите имя стрика и убедитесь, что вы вошли в систему!', "error");
+            }
+        });
+    }
+
+    // Обработчик продолжения стрика
+    const continueStreakButton = document.getElementById('continueStreakButton');
+    if (continueStreakButton) {
+        continueStreakButton.addEventListener('click', () => {
+            const userId = auth.currentUser?.uid; // Получаем ID текущего пользователя
+
+            if (userId) {
+                continueStreak(userId);
+            } else {
+                showToast('Пожалуйста, войдите в систему, чтобы продолжить стрики!', "error");
+            }
+        });
+    }
+
+    // Обработчик выхода из системы
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', () => {
+            console.log("Кнопка выхода нажата"); // Лог для отладки
+            signOut(auth).then(() => {
+                console.log("Пользователь вышел из системы");
+                showToast('Вы успешно вышли из системы!');
+            }).catch((error) => {
+                console.error("Ошибка при выходе:", error.message);
+                showToast('Ошибка при выходе: ' + error.message, "error");
+            });
+        });
+    }
+
+    // Обработчик удаления стрика
+    const deleteStreakButton = document.getElementById('deleteStreakButton');
+    if (deleteStreakButton) {
+        deleteStreakButton.addEventListener('click', () => {
+            const userId = auth.currentUser?.uid; // Получаем ID текущего пользователя
+            const streakKey = document.getElementById('streakKey').value;
+
+            if (userId && streakKey) {
+                deleteStreak(userId, streakKey);
+            } else {
+                showToast('Введите ключ стрика и убедитесь, что вы вошли в систему!', "error");
+            }
+        });
+    }
 });
 
 // Функция для добавления стрика
@@ -84,26 +156,7 @@ const addStreak = (userId, streakName) => {
     });
 };
 
-// Обработчик добавления стрика
-document.getElementById('addStreakButton').addEventListener('click', () => {
-    const userId = auth.currentUser?.uid; // Получаем ID текущего пользователя
-    const streakName = document.getElementById('streakName').value;
-
-    if (userId && streakName) {
-        addStreak(userId, streakName).then(() => {
-            showToast('Стрик добавлен!');
-            document.getElementById('streakName').value = ''; // Очистить поле ввода
-            loadStreaks(userId); // Обновить список стриков
-        }).catch((error) => {
-            showToast('Ошибка при добавлении стрика: ' + error.message, "error");
-        });
-    } else {
-        showToast('Введите имя стрика и убедитесь, что вы вошли в систему!', "error");
-    }
-});
-
 // Функция для загрузки стриков
-
 const loadStreaks = (userId) => {
     const streaksRef = ref(database, 'users/' + userId + '/streaks/');
     get(streaksRef).then((snapshot) => {
@@ -224,6 +277,7 @@ const loadStreaks = (userId) => {
         showToast('Ошибка при загрузке стриков: ' + error.message, "error");
     });
 };
+
 // Функция для продолжения стриков
 const continueStreak = (userId) => {
     const streaksRef = ref(database, 'users/' + userId + '/streaks/');
@@ -236,9 +290,7 @@ const continueStreak = (userId) => {
                 const today = new Date();
 
                 // Проверяем, обновлялся ли стрик сегодня
-                if (
-                    today.toDateString() !== lastUpdated.toDateString()
-                ) {
+                if (today.toDateString() !== lastUpdated.toDateString()) {
                     const streakRef = ref(database, `users/${userId}/streaks/${childSnapshot.key}`);
                     set(streakRef, {
                         count: streak.count + 1,
@@ -264,26 +316,6 @@ const continueStreak = (userId) => {
     });
 };
 
-// Обработчик продолжения стрика
-document.getElementById('continueStreakButton').addEventListener('click', () => {
-    const userId = auth.currentUser?.uid; // Получаем ID текущего пользователя
-
-    if (userId) {
-        continueStreak(userId);
-    } else {
-        showToast('Пожалуйста, войдите в систему, чтобы продолжить стрики!', "error");
-    }
-});
-
-// Обработчик выхода из системы
-document.getElementById('logoutButton').addEventListener('click', () => {
-    signOut(auth).then(() => {
-        console.log("Пользователь вышел из системы");
-    }).catch((error) => {
-        console.error("Ошибка при выходе:", error.message);
-    });
-});
-
 // Функция для удаления стрика
 const deleteStreak = (userId, streakKey) => {
     const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
@@ -297,7 +329,7 @@ const deleteStreak = (userId, streakKey) => {
         });
 };
 
-// Функция для изменения стрика// Функция для редактирования стрика с использованием prompt для нового имени
+// Функция для изменения стрика
 const editStreak = (userId, streakKey) => {
     const newName = prompt("Введите новое имя для стрика", streakKey);
 
