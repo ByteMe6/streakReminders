@@ -1,4 +1,4 @@
-import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut, remove } from './firebase.js';
+import { auth, database, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, ref, set, get, signOut, remove, onValue } from './firebase.js';
 
 // Функция для регистрации пользователя
 const registerUser = (email, password) => {
@@ -29,24 +29,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const streaksContainer = document.getElementById('streaksContainer');
         const addStreakSection = document.querySelector('.addStreak');
         const logoutButton = document.getElementById('logoutButton');
+        const addStreakButton = document.getElementById('addStreakButton');
         
         if (user) {
-            // Если пользователь аутентифицирован, скрываем формы регистрации и входа
+            // Если пользователь аутентифицирован
             if (registerSection) registerSection.style.display = 'none';
             if (streaksContainer) streaksContainer.style.display = 'block';
             if (addStreakSection) addStreakSection.style.display = 'block';
-            
-            // Показать кнопку выхода
+            if (addStreakButton) addStreakButton.style.display = 'block';
             if (logoutButton) logoutButton.style.display = 'inline-block';
             
-            loadStreaks(user.uid); // Загрузить стрики
+            setupStreaksListener(user.uid);
         } else {
-            // Если пользователь не аутентифицирован, показываем формы регистрации и входа
+            // Если пользователь не аутентифицирован
             if (registerSection) registerSection.style.display = 'block';
             if (streaksContainer) streaksContainer.style.display = 'none';
             if (addStreakSection) addStreakSection.style.display = 'none';
-            
-            // Скрыть кнопку выхода
+            if (addStreakButton) addStreakButton.style.display = 'none';
             if (logoutButton) logoutButton.style.display = 'none';
         }
     });
@@ -85,19 +84,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const addStreakButton = document.getElementById('addStreakButton');
     if (addStreakButton) {
         addStreakButton.addEventListener('click', () => {
-            const userId = auth.currentUser?.uid; // Получаем ID текущего пользователя
-            const streakName = document.getElementById('streakName').value;
-
-            if (userId && streakName) {
-                addStreak(userId, streakName).then(() => {
-                    showToast('Стрик добавлен!');
-                    document.getElementById('streakName').value = ''; // Очистить поле ввода
-                    loadStreaks(userId); // Обновить список стриков
-                }).catch((error) => {
-                    showToast('Ошибка при добавлении стрика: ' + error.message, "error");
-                });
+            const streakName = document.getElementById('streakName').value.trim();
+            if (streakName) {
+                const user = auth.currentUser;
+                if (user) {
+                    const today = new Date();
+                    const todayFormatted = `${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}`;
+                    
+                    const streakRef = ref(database, 'users/' + user.uid + '/streaks/' + streakName);
+                    set(streakRef, {
+                        count: 0,
+                        lastUpdated: todayFormatted
+                    }).then(() => {
+                        document.getElementById('streakName').value = '';
+                        showToast(`Стрик "${streakName}" добавлен!`);
+                    }).catch((error) => {
+                        showToast('Ошибка при добавлении стрика: ' + error.message, "error");
+                    });
+                }
             } else {
-                showToast('Введите имя стрика и убедитесь, что вы вошли в систему!', "error");
+                showToast('Введите имя стрика!', "error");
             }
         });
     }
@@ -366,4 +372,128 @@ const editStreak = (userId, streakKey) => {
     } else {
         showToast('Имя стрика не изменилось или введено некорректно!', "error");
     }
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return 'Дата не указана';
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Некорректная дата';
+    
+    return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+};
+
+// Добавляем новую функцию для слушателя изменений
+const setupStreaksListener = (userId) => {
+    const streaksRef = ref(database, 'users/' + userId + '/streaks/');
+    
+    onValue(streaksRef, (snapshot) => {
+        const streaksList = document.getElementById('streaksList');
+        if (!streaksList) return;
+
+        streaksList.innerHTML = '';
+
+        if (snapshot.exists()) {
+            snapshot.forEach((childSnapshot) => {
+                const streak = childSnapshot.val();
+                const streakKey = childSnapshot.key;
+                const today = new Date();
+                const todayFormatted = `${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}`;
+
+                // Проверка на обнуление стрика
+                if (streak.lastUpdated) {
+                    const [day, month, year] = streak.lastUpdated.split('.');
+                    const lastUpdated = new Date(year, month - 1, day);
+                    const timeDifference = today - lastUpdated;
+                    const twoDaysInMs = 2 * 24 * 60 * 60 * 1000;
+                    
+                    if (timeDifference > twoDaysInMs) {
+                        const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                        set(streakRef, {
+                            count: 0,
+                            lastUpdated: todayFormatted
+                        });
+                        showToast(`Стрик "${streakKey}" был сброшен, так как не обновлялся более 2 дней.`, "warning");
+                        return;
+                    }
+                }
+
+                const streakItem = document.createElement('div');
+                streakItem.classList.add('streakItem');
+
+                const streakName = document.createElement('span');
+                streakName.textContent = `${streakKey} `;
+                streakName.classList.add('streakName');
+
+                const streakCount = document.createElement('span');
+                streakCount.classList.add('streakCount');
+                streakCount.textContent = `${streak.count}`;
+
+                const lastUpdatedText = document.createElement('span');
+                lastUpdatedText.textContent = ` (Последнее обновление: ${streak.lastUpdated})`;
+                lastUpdatedText.classList.add('lastUpdated');
+
+                const continueButton = document.createElement('button');
+                continueButton.textContent = 'Продолжить стрик';
+                continueButton.classList.add('continueButton');
+                
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Изменить';
+                editButton.classList.add('editButton');
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Удалить';
+                deleteButton.classList.add('deleteButton');
+
+                streakItem.appendChild(streakName);
+                streakItem.appendChild(streakCount);
+                streakItem.appendChild(lastUpdatedText);
+                streakItem.appendChild(continueButton);
+                streakItem.appendChild(editButton);
+                streakItem.appendChild(deleteButton);
+
+                continueButton.addEventListener('click', () => {
+                    if (streak.lastUpdated !== todayFormatted) {
+                        const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                        set(streakRef, {
+                            count: streak.count + 1,
+                            lastUpdated: todayFormatted
+                        });
+                        showToast(`Стрик "${streakKey}" продолжен!`);
+                    } else {
+                        showToast(`Стрик "${streakKey}" уже обновлен сегодня!`, "error");
+                    }
+                });
+
+                editButton.addEventListener('click', () => {
+                    const newName = prompt(`Введите новое имя для стрика "${streakKey}"`, streakKey);
+                    if (newName && newName.trim() !== '' && newName !== streakKey) {
+                        const oldStreakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                        const newStreakRef = ref(database, `users/${userId}/streaks/${newName}`);
+                        get(oldStreakRef).then((snapshot) => {
+                            if (snapshot.exists()) {
+                                set(newStreakRef, snapshot.val()).then(() => {
+                                    remove(oldStreakRef);
+                                    showToast(`Стрик переименован в "${newName}"`);
+                                });
+                            }
+                        });
+                    }
+                });
+
+                deleteButton.addEventListener('click', () => {
+                    if (confirm(`Вы уверены, что хотите удалить стрик "${streakKey}"?`)) {
+                        const streakRef = ref(database, `users/${userId}/streaks/${streakKey}`);
+                        remove(streakRef).then(() => {
+                            showToast(`Стрик "${streakKey}" удален`);
+                        });
+                    }
+                });
+
+                streaksList.appendChild(streakItem);
+            });
+        } else {
+            console.log('Нет стриков');
+        }
+    });
 };
