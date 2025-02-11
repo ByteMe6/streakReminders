@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     const streakRef = ref(database, 'users/' + user.uid + '/streaks/' + streakName);
                     set(streakRef, {
-                        count: 0,
+                        count: 1,
                         lastUpdated: todayFormatted
                     }).then(() => {
                         document.getElementById('streakName').value = '';
