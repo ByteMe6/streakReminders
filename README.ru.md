@@ -2,7 +2,7 @@
 
 Отслеживай ежедневные привычки с помощью стриков — как в Duolingo, но для чего угодно.
 
-[English](./README.md)
+**[Демо](https://byteme6.github.io/streakReminders/)** · [English](./README.md)
 
 ## Возможности
 
