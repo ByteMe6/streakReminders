@@ -2,7 +2,7 @@
 
 Track daily habits with streaks — like Duolingo, but for anything you want to build consistency on.
 
-[Русский](./README.ru.md)
+**[Live Demo](https://byteme6.github.io/streakReminders/)** · [Русский](./README.ru.md)
 
 ## Features
 
